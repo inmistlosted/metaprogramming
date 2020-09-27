@@ -1,34 +1,51 @@
- /*
+/*
     The main Math class
     Contains all methods for performing basic math functions
-*/  
-  const  c  =  'bgf'  ;  
-  const  c  =  'b'  ;  
-  const  c  =  ''  '  ;  
-  // gfhfghhgfh sta;tic int Add(int a, int b)
-  var  rows  =  prompt  (  "How many rows for your multiplication table?"  )  ;  
-  var  cols  =  prompt  (  "How many columns for your multiplication table?"  )  ;  
-  if  (  rows  ==  ""  ||  rows  ==  null  )  
-  rows  =  10  ;  
-  if  (  cols  ==  ""  ||  cols  ==  null  )  
-  cols  =  10  ;  
-  createTable  (  rows  ,  cols  )  ;  
-  function  createTable  (  rows  ,  cols  )  
-  {  
-  var  j  =  1  ;  
-  var  output  =  "<table border='1' width='500' cellspacing='0'cellpadding='5'>"  ;  
-  for  (  i  =  1  ;  i  <=  rows  ;  i  ++  )  
-  {  
-  output  =  output  +  "<tr>"  ;  
-  while  (  j  <=  cols  )  
-  {  
-  output  =  output  +  "<td>"  +  i  *  j  +  "</td>"  ;  
-  j  =  j  +  1  ;  
-  }  
-  output  =  output  +  "</tr>"  ;  
-  j  =  1  ;  
-  }  
-  output  =  output  +  "</table>"  ;  
-  document  .  write  (  output  )  ;  
-  
- 
+*/
+constc='bgf';
+constc='b';
+constc='';
+// gfhfghhgfh sta;tic int Add(int a, int b)
+varrows=prompt("How many rows for your multiplication table?");
+varcols=prompt("How many columns for your multiplication table?");
+if(rows==""||rows==null)
+rows=10;
+if(cols==""||cols==null)
+cols=10;
+createTable(rows,cols);
+functioncreateTable(rows,cols){
+    varj=1;
+    varoutput="<table border='1' width='500' cellspacing='0'cellpadding='5'>";
+    for(i=1;i<=rows;i++){
+        output=output+"<tr>";
+        while(j<=cols)
+        {
+            output=output+"<td>"+i*j+"</td>";
+            j=j+1;
+        }
+        output=output+"</tr>";
+        j=1;
+    }
+    output=output+"</table>";
+    document.write(output);
+}
+
+foo(
+    "demo",
+    {
+        title:"Demo",
+        width:100
+    },
+    function(){
+        object.firstCall(
+            {
+                a:'a',
+                b:'b'
+            })
+        .secondCall()
+
+
+        .make();
+    }
+);
+

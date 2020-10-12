@@ -4,6 +4,3 @@ class SemicolonStatementsSettings(object):
 
     def Use(self):
         return self.__settings["Use"]
-
-    def Always(self):
-        return self.__settings["Always"]

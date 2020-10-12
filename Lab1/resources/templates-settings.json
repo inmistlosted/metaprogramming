@@ -196,8 +196,8 @@
       "InCode": 2
     },
     "MinimumBlackLines": {
-      "AfterImports": 1,
-      "AroundClass": 1,
+      "AfterImports": 2,
+      "AroundClass": 2,
       "AroundField": 0,
       "AroundMethod": 1,
       "AroundFunction": 1
@@ -206,13 +206,11 @@
 
   "Punctuation": {
     "SemicolonToTerminateStatements": {
-      "Use": true,
-      "Always": false
+      "Use": true
     },
     "Quotes": {
-      "Single": false,
-      "Always": false
+      "Single": false
     },
-    "TrailingComma": "Keep"
+    "TrailingComma": "Add when multiline"
   }
 }

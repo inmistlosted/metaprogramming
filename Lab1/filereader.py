@@ -1,8 +1,5 @@
 import os
 import re
-from Lexer.lexer import Lexer
-from Parser.parser import Parser
-
 
 class FileReader(object):
     JS_FILE_EXTENSION = '.js'
@@ -46,9 +43,16 @@ class FileReader(object):
                 break
 
             sourceCode += line[0:len(line) - 1]
-            sourceCode += '#'
+
+            lineSymbols = list(line)
+            if lineSymbols[len(line) - 1] == '\n':
+                sourceCode += '#'
+            else:
+                sourceCode += lineSymbols[len(line) - 1]
+
             if re.search('//', line):
                 sourceCode += '\n'
+
 
         return sourceCode
 
@@ -72,27 +76,3 @@ class FileReader(object):
         resultFile.close()
 
         return directoryPath + outputFileName
-
-
-def main():
-    print('Enter path to directory with js files: ')
-    dirName = input()
-
-    if dirName == '':
-        dirName = os.getcwd()
-
-    print(dirName)
-
-
-if __name__ == '__main__':
-    sourceCode = FileReader.readFile('resources/input-code.txt')
-    lexer = Lexer(sourceCode)
-    lexer.execute()
-    parser = Parser(lexer.getTokens())
-    result = parser.execute()
-
-    resultFile = open('resources/output-code.txt', 'w')
-    resultFile.write(result)
-    resultFile.close()
-
-    lexer.printTokens()

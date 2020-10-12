@@ -1,17 +1,11 @@
 import re
 from filereader import FileReader
 from Lexer.lexer import Lexer
-from Parser.parser import Parser
+from Formatter.formatter import Formatter
 
 
+templatesNames = ['TabsAndIndents', 'Spaces', 'Punctuation', 'All']
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-templatesNames = ['TabsAndIndents', 'Spaces', 'BlackLines', 'Punctuation', 'a']
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     while True:
         print('python JavaScriptFormatter ', end='')
@@ -34,27 +28,24 @@ if __name__ == '__main__':
                 if templateName not in templatesNames:
                     print('unrecognized template')
                 else:
-                    if FileReader.validatePath(path) is None:
-                        print('unrecognized path format')
+                    if FileReader.isFile(path):
+                        sourceCode = FileReader.readFile(path)
+                        lexer = Lexer(sourceCode)
+                        lexer.execute()
+                        parser = Formatter("Formatting", lexer.getTokens(), templateName)
+                        result = parser.execute()
+                        resultFile = FileReader.writeToFile(path, result)
+                        print('created file ' + resultFile)
                     else:
-                        if FileReader.isFile(path):
-                            sourceCode = FileReader.readFile(path)
+                        jsFiles = FileReader.getAllJsFiles(path)
+                        for file in jsFiles:
+                            sourceCode = FileReader.readFile(file)
                             lexer = Lexer(sourceCode)
                             lexer.execute()
-                            parser = Parser(lexer.getTokens(), templateName)
+                            parser = Formatter("Formatting", lexer.getTokens(), templateName)
                             result = parser.execute()
-                            resultFile = FileReader.writeToFile(path, result)
+                            resultFile = FileReader.writeToFile(file, result)
                             print('created file ' + resultFile)
-                        else:
-                            jsFiles = FileReader.getAllJsFiles(path)
-                            for file in jsFiles:
-                                sourceCode = FileReader.readFile(path)
-                                lexer = Lexer(sourceCode)
-                                lexer.execute()
-                                parser = Parser(lexer.getTokens(), templateName)
-                                result = parser.execute()
-                                resultFile = FileReader.writeToFile(path, result)
-                                print('created file ' + resultFile)
         elif command[0:2] == '-v':
             parts = command.split()
 
@@ -62,26 +53,24 @@ if __name__ == '__main__':
                 print('unrecognized command')
             else:
                 path = parts[1]
-                if FileReader.validatePath(path) is None:
-                    print('unrecognized path format')
+                if FileReader.isFile(path):
+                    sourceCode = FileReader.readFile(path)
+                    lexer = Lexer(sourceCode)
+                    lexer.execute()
+                    parser = Formatter("Error search", lexer.getTokens())
+                    parser.execute()
+                    print('Errors printed to file resources/logfile.txt')
                 else:
-                    if FileReader.isFile(path):
-                        sourceCode = FileReader.readFile(path)
-
-                    else:
-                        jsFiles = FileReader.getAllJsFiles(path)
-                        for file in jsFiles:
-                            sourceCode = FileReader.readFile(path)
+                    jsFiles = FileReader.getAllJsFiles(path)
+                    for file in jsFiles:
+                        sourceCode = FileReader.readFile(file)
+                        lexer = Lexer(sourceCode)
+                        lexer.execute()
+                        parser = Formatter("Error search", lexer.getTokens())
+                        parser.execute()
+                        print('Errors printed to file resources/logfile.txt')
         elif command == '-quit':
             break
-
-
-
-
         else:
             print('unrecognized command')
 
-
-
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/

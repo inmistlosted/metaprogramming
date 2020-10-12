@@ -25,9 +25,3 @@ class TemplatesSettings(object):
 
     def PunctuationSettings(self):
         return self.__punctuationSettings
-
-
-if __name__ == '__main__':
-    sets = TemplatesSettings()
-
-    print(sets.TabsAndIndentsSettings().TabSize())

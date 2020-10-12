@@ -1,5 +1,4 @@
 from Settings.Spaces.beforeleftbracesettings import BeforeLeftBraceSettings
-from Settings.Spaces.inflowsettings import InFlowSettings
 from Settings.Spaces.withinsettings import WithinSettings
 from Settings.Spaces.aroundoperatorssettings import AroundOperatorsSettings
 from Settings.Spaces.beforekeywordssettings import BeforeKeywordsSettings
@@ -17,7 +16,6 @@ class SpacesSettings(object):
         self.__withinSettings = WithinSettings(settings["Within"])
         self.__inTernaryOperatorSettings = InTernaryOperatorSettings(settings["InTernaryOperator"])
         self.__otherSettings = OtherSettings(settings["Other"])
-        self.__inFlowSettings = InFlowSettings(settings["InFlow"])
 
     def AroundOperators(self):
         return self.__aroundOperatorsSettings
@@ -39,6 +37,3 @@ class SpacesSettings(object):
 
     def Other(self):
         return self.__otherSettings
-
-    def InFlow(self):
-        return self.__inFlowSettings

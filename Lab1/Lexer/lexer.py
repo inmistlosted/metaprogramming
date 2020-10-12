@@ -1,5 +1,5 @@
 import re
-from Lexer.token1 import Token
+from Lexer.lexertoken import Token
 from Lexer.dictionary import Dictionary
 
 
@@ -215,6 +215,7 @@ class Lexer(object):
         word = re.sub('\^', '\^', word)
         word = re.sub('\|', '\|', word)
         word = re.sub('\.', '\.', word)
+        word = re.sub('\$', '\$', word)
 
         return word
 
@@ -223,15 +224,4 @@ class Lexer(object):
         for token in self.__tokens:
             print("     " + token.toString())
 
-
-if __name__ == '__main__':
-    string = '"How many rows for your multiplication table?"'
-
-    if re.search(r'"How many rows for your multiplication table?"', string) is None:
-        print(1)
-    else:
-        print(2)
-
-    for i in range(0, 5):
-        print(i)
 

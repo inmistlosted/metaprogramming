@@ -27,7 +27,7 @@
       "EqualityOperators": true,
       "RelationOperators": true,
       "BitwiseOperators": true,
-      "AdditiveOperators": true,
+      "AdditiveOperators": false,
       "MultiplicativeOperators": true,
       "ShiftOperators": true,
       "UnaryAdditiveOperators": false,
@@ -59,15 +59,15 @@
       "GroupingParentheses": false,
       "FunctionDeclarationParentheses": false,
       "FunctionCallParentheses": false,
-      "IfParentheses": false,
-      "ForParentheses": false,
+      "IfParentheses": true,
+      "ForParentheses": true,
       "WhileParentheses": false,
       "SwitchParentheses": false,
       "CatchParentheses": false,
       "ObjectLiteralBraces": false,
-      "ES6ImportExportBraces": false,
+      "ES6ImportExportBraces": true,
       "ArrayBraces": false,
-      "InterpolationExpressions": false
+      "InterpolationExpressions": true
     },
     "InTernaryOperator": {
       "BeforeQuestionMark": true,
@@ -78,18 +78,12 @@
     "Other": {
       "BeforeComma": false,
       "AfterComma": true,
-      "BeforeForSemicolon": false,
+      "BeforeForSemicolon": true,
       "BeforePropertyNameValueSeparator": false,
       "AfterPropertyNameValueSeparator": true,
       "AfterTriplePointsInRestSpread": false,
       "BeforeMultiplicationInGenerator": false,
       "AfterMultiplicationInGenerator": true
-    },
-    "InFlow": {
-      "BeforeTypeReferenceColon": false,
-      "AfterTypeReferenceColon": true,
-      "ObjectLiteralTypeBraces": true,
-      "UnionAndIntersectionTypes": true
     }
   },
 
@@ -202,8 +196,8 @@
       "InCode": 2
     },
     "MinimumBlackLines": {
-      "AfterImports": 1,
-      "AroundClass": 1,
+      "AfterImports": 2,
+      "AroundClass": 2,
       "AroundField": 0,
       "AroundMethod": 1,
       "AroundFunction": 1
@@ -212,13 +206,11 @@
 
   "Punctuation": {
     "SemicolonToTerminateStatements": {
-      "Use": true,
-      "Always": false
+      "Use": true
     },
     "Quotes": {
-      "Single": false,
-      "Always": false
+      "Single": false
     },
-    "TrailingComma": "Keep"
+    "TrailingComma": "Add when multiline"
   }
 }

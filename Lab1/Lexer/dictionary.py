@@ -12,7 +12,7 @@ class Dictionary(object):
             if not line:
                 break
 
-            settings = line.split(":")
+            settings = line.split(":=")
             if settings[0] == "keywords":
                 self.__keywords = settings[1].split(",")
             elif settings[0] == "operators":

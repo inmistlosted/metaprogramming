@@ -1,2 +1,0 @@
----------- file name: D:/4kurs/1semestr/metaProgramming/Labs/Lab1/resources/input-code.js ---- analysis time: 10/17/2020, 22:32:14 ----------
-Wrong value after literal(line: 132, index: 725)

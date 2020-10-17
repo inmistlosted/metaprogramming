@@ -8,44 +8,36 @@ class Formatter(object):
     def __init__(self, type, tokens, templateName:str=None):
         self.__lexerTokens = tokens
         self.__type = type
-        self.__settings = TemplatesSettings()
+        self.__settings = TemplatesSettings(templateName)
         self.__tokens = []
         self.__getFormatterTokens()
         self.__templateName = templateName
 
     def execute(self):
         if self.__type == "Formatting":
-            if self.__templateName == "TabsAndIndents":
-                self.__applyIndents()
-            elif self.__templateName == "Spaces":
-                self.__applySpaces()
-            elif self.__templateName == "BlackLines":
-                self.__setElementsBlackLines()
-            elif self.__templateName == "Punctuation":
-                self.__applyPunctuation()
-            elif self.__templateName == "All":
-                self.__applyIndents()
-                self.__applySpaces()
-                self.__applyPunctuation()
+            self.__applyIndents()
+            self.__applySpaces()
+            self.__applyPunctuation()
 
-                result = ""
+            result = ""
 
-                for token in self.__tokens:
-                    tokenIndent = self.__getIndentView(token.getIndent(), token.getContIndent())
+            for token in self.__tokens:
+                tokenIndent = self.__getIndentView(token.getIndent(), token.getContIndent())
 
-                    tokenValue = list(token.getValue())
+                tokenValue = list(token.getValue())
 
-                    for i in range(0, len(tokenValue)):
-                        if tokenValue[i] == '#':
-                            tokenValue[i] = '\n' + tokenIndent
+                for i in range(0, len(tokenValue)):
+                    if tokenValue[i] == '#':
+                        tokenValue[i] = '\n' + tokenIndent
 
-                    tokenString = ''
-                    tokenString = tokenString.join(tokenValue)
-                    tokenResult = tokenString
+                tokenString = ''
+                tokenString = tokenString.join(tokenValue)
+                tokenResult = tokenString
 
-                    result += tokenResult
+                result += tokenResult
 
-                return result
+            return result
+
         else:
             with open("resources/logfile.txt", "a") as logFile:
                 now = datetime.now()
@@ -900,7 +892,7 @@ class Formatter(object):
                     elif self.__tokens[i].getValue() == "delete" and self.__tokens[j].getGroupName() != "identifier":
                         self.__printError(j, "Wrong value after delete")
                         break
-                    elif self.__tokens[i].getValue() == "else" and self.__tokens[j].getValue() != "{":
+                    elif self.__tokens[i].getValue() == "else" and self.__tokens[j].getValue() != "{" and self.__tokens[j].getValue() != "if":
                         self.__printError(j, "Missing { after else")
                         break
                     elif self.__tokens[i].getValue() == "finally" and self.__tokens[j].getValue() != "{":
@@ -949,7 +941,7 @@ class Formatter(object):
                     if self.__tokens[l].getGroupName() == "new line":
                         l -= 1
 
-                    elif self.__tokens[i].getValue() == "break" and self.__tokens[l].getValue() != ";" and self.__tokens[l].getGroupName() != "comments":
+                    elif self.__tokens[i].getValue() == "break" and self.__tokens[l].getValue() != ";" and self.__tokens[l].getGroupName() != "comments" and self.__tokens[l].getValue() != "}" and self.__tokens[l].getValue() != "{":
                         self.__printError(i, "Wrong value before break")
                         break
                     elif self.__tokens[i].getValue() == "case" and self.__tokens[l].getValue() != ";" and self.__tokens[l].getValue() != "{" and self.__tokens[l].getGroupName() != "comments":
@@ -970,10 +962,10 @@ class Formatter(object):
                     elif self.__tokens[i].getValue() == "for" and self.__tokens[l].getValue() != ";" and self.__tokens[l].getValue() != "}" and self.__tokens[l].getValue() != "{" and self.__tokens[l].getGroupName() != "comments":
                         self.__printError(i, "Wrong value before for")
                         break
-                    elif self.__tokens[i].getValue() == "function" and self.__tokens[l].getValue() != ";" and self.__tokens[l].getValue() != "}" and self.__tokens[l].getValue() != "{" and self.__tokens[l].getValue() != "," and self.__tokens[l].getValue() != "=" and self.__tokens[l].getGroupName() != "comments":
+                    elif self.__tokens[i].getValue() == "function" and self.__tokens[l].getValue() != ";" and self.__tokens[l].getValue() != "}" and self.__tokens[l].getValue() != "{" and self.__tokens[l].getValue() != "," and self.__tokens[l].getValue() != "=" and self.__tokens[l].getGroupName() != "comments" and self.__tokens[l].getValue() != ":" and self.__tokens[l].getValue() != "(" and self.__tokens[l].getValue() != "return":
                         self.__printError(i, "Wrong value before function")
                         break
-                    elif self.__tokens[i].getValue() == "if" and self.__tokens[l].getValue() != ";" and self.__tokens[l].getValue() != "}" and self.__tokens[l].getValue() != "{" and self.__tokens[l].getValue() != "(" and self.__tokens[l].getGroupName() != "comments":
+                    elif self.__tokens[i].getValue() == "if" and self.__tokens[l].getValue() != ";" and self.__tokens[l].getValue() != "}" and self.__tokens[l].getValue() != "{" and self.__tokens[l].getValue() != "(" and self.__tokens[l].getGroupName() != "comments" and self.__tokens[l].getValue() != "else":
                         self.__printError(i, "Wrong value before if")
                         break
                     elif self.__tokens[i].getValue() == "let" and self.__tokens[l].getValue() != ";" and self.__tokens[l].getValue() != "}" and self.__tokens[l].getValue() != "{" and self.__tokens[l].getGroupName() != "comments":
@@ -1084,7 +1076,7 @@ class Formatter(object):
                     if self.__tokens[l].getGroupName() == "new line":
                         l -= 1
                     elif self.__tokens[l].getGroupName() == "punctuation mark":
-                        if self.__tokens[i].getValue() != "=>" and self.__tokens[l].getValue() != ")" and self.__tokens[i].getValue() != "!" and self.__tokens[l].getValue() != "]":
+                        if self.__tokens[i].getValue() != "=>" and self.__tokens[l].getValue() != ")" and self.__tokens[l].getValue() != "(" and self.__tokens[i].getValue() != "!" and self.__tokens[l].getValue() != "]":
                             self.__printError(i, "Wrong value before operator")
                         break
                     else:

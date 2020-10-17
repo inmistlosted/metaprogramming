@@ -1,6 +1,6 @@
 {
   "TabsAndIndents": {
-    "UseTabsCharacter": false,
+    "UseTabsCharacter": true,
     "TabSize": 4,
     "Indent": 4,
     "ContinuationIndent": 4,

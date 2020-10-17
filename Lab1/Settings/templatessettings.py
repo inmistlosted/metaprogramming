@@ -6,8 +6,11 @@ from Settings.Punktuation.punctuationsettings import PunctuationSettings
 
 
 class TemplatesSettings(object):
-    def __init__(self):
-        with open("resources/templates-settings.json", "r") as settingsFile:
+    def __init__(self, templatePath:str=None):
+        if templatePath is None:
+            templatePath = 'resources/templates-settings.json'
+
+        with open(templatePath, "r") as settingsFile:
             settings = json.load(settingsFile)
             self.__tabsAndIndentsSettings = TabsAndIndentsSettings(settings["TabsAndIndents"])
             self.__spacesSettings = SpacesSettings(settings["Spaces"])

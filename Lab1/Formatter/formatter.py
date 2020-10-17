@@ -5,13 +5,14 @@ from datetime import datetime
 
 
 class Formatter(object):
-    def __init__(self, type, tokens, templateName:str=None):
+    def __init__(self, type, tokens, fileName, templateName:str=None):
         self.__lexerTokens = tokens
         self.__type = type
         self.__settings = TemplatesSettings(templateName)
         self.__tokens = []
         self.__getFormatterTokens()
         self.__templateName = templateName
+        self.__fileName = fileName
 
     def execute(self):
         if self.__type == "Formatting":
@@ -41,7 +42,7 @@ class Formatter(object):
         else:
             with open("resources/logfile.txt", "a") as logFile:
                 now = datetime.now()
-                logFile.write("---------- analysis time: " + now.strftime("%m/%d/%Y, %H:%M:%S") + " ----------\n")
+                logFile.write("---------- file name: " + self.__fileName + " ---- analysis time: " + now.strftime("%m/%d/%Y, %H:%M:%S") + " ----------\n")
             self.__getMistakes()
             self.__getParenthesesTypes()
             self.__getBracesTypes()

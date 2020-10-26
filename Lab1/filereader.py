@@ -66,7 +66,7 @@ class FileReader(object):
 
     @staticmethod
     def writeToFile(inputFileName, text):
-        directoryPath = re.match(r'[A-Za-z]:/(\w+/)*', inputFileName).group(0)
+        directoryPath = os.path.dirname(inputFileName)
         fileName = inputFileName[len(directoryPath):]
         outputFile = fileName.split('.')
         outputFileName = outputFile[0] + '-formatted.' + outputFile[1]

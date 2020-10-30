@@ -14,7 +14,6 @@ class TemplatesSettings(object):
             settings = json.load(settingsFile)
             self.__tabsAndIndentsSettings = TabsAndIndentsSettings(settings["TabsAndIndents"])
             self.__spacesSettings = SpacesSettings(settings["Spaces"])
-            self.__blackLinesSettings = BlackLinesSettings(settings["BlankLines"])
             self.__punctuationSettings = PunctuationSettings(settings["Punctuation"])
 
     def TabsAndIndentsSettings(self):

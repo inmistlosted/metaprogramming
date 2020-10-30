@@ -66,13 +66,8 @@ class FileReader(object):
 
     @staticmethod
     def writeToFile(inputFileName, text):
-        directoryPath = os.path.dirname(inputFileName)
-        fileName = inputFileName[len(directoryPath):]
-        outputFile = fileName.split('.')
-        outputFileName = outputFile[0] + '-formatted.' + outputFile[1]
-
-        resultFile = open(directoryPath + outputFileName, 'w')
+        resultFile = open(inputFileName, 'w')
         resultFile.write(text)
         resultFile.close()
 
-        return directoryPath + outputFileName
+        return inputFileName

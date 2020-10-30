@@ -23,7 +23,7 @@ if __name__ == '__main__':
                 formatter = Formatter("Formatting", lexer.getTokens(), path, templateName)
                 result = formatter.execute()
                 resultFile = FileReader.writeToFile(path, result)
-                print('created file ' + resultFile)
+                print('formatted file ' + resultFile)
             else:
                 jsFiles = FileReader.getAllJsFiles(path)
                 for file in jsFiles:
@@ -33,7 +33,7 @@ if __name__ == '__main__':
                     formatter = Formatter("Formatting", lexer.getTokens(), file, templateName)
                     result = formatter.execute()
                     resultFile = FileReader.writeToFile(file, result)
-                    print('created file ' + resultFile)
+                    print('formatted file ' + resultFile)
 
         elif command == '-v':
             path = args[1]

@@ -62,7 +62,7 @@ class FileReader(object):
 
     @staticmethod
     def isFile(name):
-        return re.search(r'\.', name)
+        return os.path.isfile(name)
 
     @staticmethod
     def writeToFile(inputFileName, text):

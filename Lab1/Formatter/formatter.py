@@ -1099,13 +1099,14 @@ class Formatter(object):
 
         for i in range(0, len(self.__tokens)):
             if self.__tokens[i].getValue() == ";" and i + 1 != len(self.__tokens) and self.__tokens[i+1].getGroupName() != "new line" and self.__tokens[i+1].getGroupName() != "comment":
-                newLineIndices.append(i+1)
+                if i - 6 > 0 and self.__tokens[i-6].getValue() != "for" and self.__tokens[i-5].getValue() != "for" and i - 10 > 0 and self.__tokens[i-10].getValue() != "for" and self.__tokens[i-9].getValue() != "for":
+                    newLineIndices.append(i + 1)
             elif self.__tokens[i].getValue() == "{" and i + 1 != len(self.__tokens) and self.__tokens[i+1].getGroupName() != "new line" and self.__tokens[i+1].getGroupName() != "comment":
                 newLineIndices.append(i + 1)
             elif self.__tokens[i].getValue() == "}" and i + 1 != len(self.__tokens) and self.__tokens[i+1].getGroupName() != "new line" and self.__tokens[i+1].getGroupName() != "comment":
                 if i != 0 and self.__tokens[i - 1].getGroupName() != "new line" and self.__tokens[i-1].getValue() != ";":
                     newLineIndices.append(i)
-                if i + 1 != len(self.__tokens) and self.__tokens[i+1].getGroupName() != "new line" and self.__tokens[i+1].getGroupName() != "comment":
+                if i + 1 != len(self.__tokens) and self.__tokens[i+1].getGroupName() != "new line" and self.__tokens[i+1].getGroupName() != "comment" and self.__tokens[i+1].getValue() != ";":
                     newLineIndices.append(i + 1)
 
         diff = 0

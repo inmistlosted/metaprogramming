@@ -16,6 +16,7 @@ class Formatter(object):
 
     def execute(self):
         if self.__type == "Formatting":
+            self.__applyNewLines()
             self.__applyIndents()
             self.__applySpaces()
             self.__applyPunctuation()
@@ -114,12 +115,6 @@ class Formatter(object):
                         self.__tokens[i - 1].setIndent(indentLevel)
                     else:
                         self.__tokens[i - 1].setIndent(indentLevel+1)
-
-            if indentLevel < 0:
-                print("Syntacsis error")
-
-            if contIndent < 0:
-                print("Syntacsis error")
 
     def __applySpaces(self):
         self.__getParenthesesTypes()
@@ -1099,5 +1094,22 @@ class Formatter(object):
             errorView = value + "(line: " + str(lineCount) + ", index: " + str(index) + ")\n"
             logFile.write(errorView)
 
+    def __applyNewLines(self):
+        newLineIndices = []
 
+        for i in range(0, len(self.__tokens)):
+            if self.__tokens[i].getValue() == ";" and i + 1 != len(self.__tokens) and self.__tokens[i+1].getGroupName() != "new line" and self.__tokens[i+1].getGroupName() != "comment":
+                newLineIndices.append(i+1)
+            elif self.__tokens[i].getValue() == "{" and i + 1 != len(self.__tokens) and self.__tokens[i+1].getGroupName() != "new line" and self.__tokens[i+1].getGroupName() != "comment":
+                newLineIndices.append(i + 1)
+            elif self.__tokens[i].getValue() == "}" and i + 1 != len(self.__tokens) and self.__tokens[i+1].getGroupName() != "new line" and self.__tokens[i+1].getGroupName() != "comment":
+                if i != 0 and self.__tokens[i - 1].getGroupName() != "new line" and self.__tokens[i-1].getValue() != ";":
+                    newLineIndices.append(i)
+                if i + 1 != len(self.__tokens) and self.__tokens[i+1].getGroupName() != "new line" and self.__tokens[i+1].getGroupName() != "comment":
+                    newLineIndices.append(i + 1)
+
+        diff = 0
+        for index in newLineIndices:
+            self.__tokens.insert(index + diff, FormatterToken(Token("new line", "#")))
+            diff += 1
 

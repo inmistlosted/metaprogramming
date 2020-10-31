@@ -97,6 +97,7 @@ class Lexer(object):
 
             literal = self.__replace(literal)
             matcher = re.search(literal, string)
+            if matcher is None: continue
             string = string[0:matcher.start()] + string[matcher.end():]
 
         return string
@@ -106,7 +107,9 @@ class Lexer(object):
         result = re.findall(pattern, string)
 
         for symbol in result:
+            symbol = self.__replace(symbol)
             matcher = re.search(symbol, string)
+            if matcher is None: continue
             string = string[0:matcher.start()] + string[matcher.end():]
             self.__currStringTokens.append(Token("symbolic constant", symbol))
 

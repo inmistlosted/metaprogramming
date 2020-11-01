@@ -631,15 +631,19 @@ class Formatter(object):
 
     def __getIndentView(self, indent, contIndent):
         tokenIndent = ''
-        indentViewSymbol = '-' if self.__settings.TabsAndIndentsSettings().UseTabsCharacter() else ' '
+        indentViewSymbol = '\t'
         defaultViewSymbol = ' '
         indentSize = contIndent * self.__settings.TabsAndIndentsSettings().ContinuationIndent() + indent * self.__settings.TabsAndIndentsSettings().Indent()
 
-        for i in range(0, indentSize):
-            if i < (
-                    indentSize // self.__settings.TabsAndIndentsSettings().TabSize()) * self.__settings.TabsAndIndentsSettings().TabSize():
+        if self.__settings.TabsAndIndentsSettings().UseTabsCharacter():
+            tabsCount = indentSize // 4
+            spacesCount = indentSize - tabsCount * 4
+            for i in range(0, tabsCount):
                 tokenIndent += indentViewSymbol
-            else:
+            for i in range(0, spacesCount):
+                tokenIndent += defaultViewSymbol
+        else:
+            for i in range(0, indentSize):
                 tokenIndent += defaultViewSymbol
 
         return tokenIndent

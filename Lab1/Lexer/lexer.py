@@ -107,8 +107,8 @@ class Lexer(object):
         result = re.findall(pattern, string)
 
         for symbol in result:
-            symbol = self.__replace(symbol)
-            matcher = re.search(symbol, string)
+            symbolCopy = self.__replace(symbol)
+            matcher = re.search(symbolCopy, string)
             if matcher is None: continue
             string = string[0:matcher.start()] + string[matcher.end():]
             self.__currStringTokens.append(Token("symbolic constant", symbol))

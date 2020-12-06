@@ -19,7 +19,7 @@ if __name__ == '__main__':
     attributes = [('age', 12), ('id', 1)]
     print(dbms.find_object('DOGS', dog))
     print(dbms.find_objects_by('DOGS', attributes))
-    
+
     attrs = ['age']
     print(dbms.find_class(Dog2))
     print(dbms.find_classes_by(attrs))
@@ -27,3 +27,6 @@ if __name__ == '__main__':
     print(df.color)
     objects = dbms.create_objects('DOGS', 1, 2)
     print(objects[0].color)
+
+    dbms.create_class('DOGS', 'mod1')
+    dbms.create_hierarchy('OWNER', 'pack1')

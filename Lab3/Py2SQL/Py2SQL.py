@@ -1,5 +1,7 @@
+import inspect
 import fdb
 import os
+from Py2SQL.generators.FileGenerator import FileGenerator
 from Py2SQL.entities.Object import Object
 
 
@@ -325,3 +327,96 @@ class Py2SQL(object):
             objects.append(obj)
 
         return objects
+
+    def getAttributes(self, clss):
+        attrs = {}
+        for name in vars(clss):
+            if name.startswith("__") or name.endswith("__"):
+                continue
+            attr = getattr(clss, name)
+            if callable(attr):
+                continue
+            attrs[name] = attr
+        return attrs
+
+    def create_class(self, table, module):
+        attributes = [x[1] for x in self.db_table_structure(table)]
+        class_name = table[:len(table)-1] if table.lower().endswith('s') else table
+        class_name = class_name.lower().capitalize()
+
+        file_content = FileGenerator.get_python_class(class_name, attributes)
+        created = FileGenerator.create_class(module, file_content)
+
+        frame = inspect.stack()[1]
+        mod = inspect.getmodule(frame[0])
+        filename = mod.__file__
+        FileGenerator.import_module(filename, module, class_name, created)
+
+    def create_hierarchy(self, table, package):
+        package_created = FileGenerator.create_package(package)
+
+        if package_created:
+            tables = self.with_linked_tables(table)
+
+            frame = inspect.stack()[1]
+            mod = inspect.getmodule(frame[0])
+            filename = mod.__file__
+
+            for tab in tables:
+                attributes = [x[1] for x in self.db_table_structure(tab)]
+                class_name = tab[:len(tab) - 1] if tab.lower().endswith('s') else table
+                class_name = class_name.lower().capitalize()
+
+                module_content = FileGenerator.get_python_class(class_name, attributes)
+                created = FileGenerator.create_package_module(package, class_name.lower(), module_content)
+
+                FileGenerator.import_package_module(filename, package, class_name, created)
+
+    def with_linked_tables(self, table, already_found = None):
+        sql_linked = f"""select trim("RDB$RELATION_NAME") 
+                         from RDB$INDICES ri 
+                         where "RDB$INDEX_NAME" in (
+                            select RDB$FOREIGN_KEY 
+                            from RDB$INDICES ri 
+                            where "RDB$RELATION_NAME" = '{table}' and RDB$FOREIGN_KEY is not null)"""
+
+        sql_linked2 = f"""select trim("RDB$RELATION_NAME") 
+                          from RDB$INDICES ri 
+                          where RDB$FOREIGN_KEY in (
+                            select "RDB$INDEX_NAME" 
+                            from RDB$INDICES ri 
+                            where "RDB$RELATION_NAME" = '{table}' and RDB$UNIQUE_FLAG = 1)"""
+
+        curr_cursor = self.__connection.cursor()
+        curr_cursor.execute(sql_linked)
+        tables_list = [x[0] for x in curr_cursor.fetchall()]
+        curr_cursor.close()
+
+        curr_cursor2 = self.__connection.cursor()
+        curr_cursor2.execute(sql_linked2)
+        tables_list = tables_list + [x[0] for x in curr_cursor2.fetchall()]
+        curr_cursor2.close()
+
+        if already_found is not None:
+            for tabl in tables_list:
+                if tabl in already_found:
+                    tables_list.remove(tabl)
+                else:
+                    already_found.append(tabl)
+        else:
+            already_found = []
+            already_found = already_found + tables_list
+            already_found.append(table)
+
+        all_trans_tables = []
+        for tabl in tables_list:
+            trans_tables = self.with_linked_tables(tabl, already_found)
+            all_trans_tables = all_trans_tables + trans_tables
+
+        tables_list = tables_list + all_trans_tables
+        tables_list.append(table)
+
+        unique_set = set(tables_list)
+        unique_list = list(unique_set)
+
+        return unique_list

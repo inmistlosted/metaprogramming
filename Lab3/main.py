@@ -1,5 +1,5 @@
 from Py2SQL.Py2SQL import Py2SQL
-from Py2SQL.db.Database import Database
+from Py2SQL.Py2SQL import Database
 from entity.Dog import Dog
 from entity.Dog2 import Dog2
 from Py2SQL.generators.FileGenerator import FileGenerator

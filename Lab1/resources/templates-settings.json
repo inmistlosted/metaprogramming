@@ -1,6 +1,6 @@
 {
   "TabsAndIndents": {
-    "UseTabsCharacter": false,
+    "UseTabsCharacter": true,
     "TabSize": 4,
     "Indent": 4,
     "ContinuationIndent": 4,
@@ -84,123 +84,6 @@
       "AfterTriplePointsInRestSpread": false,
       "BeforeMultiplicationInGenerator": false,
       "AfterMultiplicationInGenerator": true
-    }
-  },
-
-  "WrappingAndBraces": {
-    "KeepWhenReformatting": {
-      "LineBreaks": true,
-      "CommentsAtFirstColumn": true,
-      "SimpleBlocksInOneLine": false,
-      "SimpleMethodsInOneLine": false
-    },
-    "Comments": {
-      "WrapAtRightMargin": false,
-      "AlignMultiline": false
-    },
-    "BracesPlacement": {
-      "InClassDeclaration": "Next line shifted",
-      "InFunctionDeclaration": "End of line",
-      "InFunctionExpression": "End of line",
-      "Other": "End of line"
-    },
-    "ExtendsList": {
-      "Wrap": "Do not wrap",
-      "AlignWhenMultiline": false
-    },
-    "ExtendsKeyword": {
-      "Wrap": "Do not wrap"
-    },
-    "FunctionDeclarationParameters": {
-      "Wrap": "Do not wrap",
-      "AlignWhenMultiline": true,
-      "NewLineAfterLeftParenthesis": false,
-      "PlaceRightParenthesisOnNewLine": false
-    },
-    "FunctionCallArguments": {
-      "Wrap": "Do not wrap",
-      "AlignWhenMultiline": false,
-      "TakePriorityOverCallChainWrapping": false,
-      "NewLineAfterLeftParenthesis": false,
-      "PlaceRightParenthesisOnNewLine": false
-    },
-    "ChainedMethodsCalls": {
-      "Wrap": "Do not wrap",
-      "AlignWhenMultiline": true,
-      "PointOnNewLine": true
-    },
-    "IfStatement": {
-      "ForceBraces": "Do not force",
-      "ElseOnNewLine": false,
-      "SpecialElseIfTreatment": true
-    },
-    "ForStatement": {
-      "Wrap": "Do not wrap",
-      "AlignWhenMultiline": true,
-      "NewLineAfterLeftParenthesis": false,
-      "PlaceRightParenthesisOnNewLine": false,
-      "ForceBraces": "Do not force"
-    },
-    "WhileStatement": {
-      "ForceBraces": "Do not force"
-    },
-    "DoWhileStatement": {
-      "ForceBraces": "Do not force",
-      "WhileOnNewLine": false
-    },
-    "SwitchStatement": {
-      "IndentCaseBranches": true
-    },
-    "TryStatement": {
-      "CatchOnNewLine": false,
-      "FinallyOnNewLine": false
-    },
-    "BinaryExpressions": {
-      "Wrap": "Wrap if long",
-      "AlignWhenMultiline": false,
-      "OperationSignOnNextLine": false,
-      "NewLineAfterLeftParenthesis": false,
-      "PlaceRightParenthesisOnNewLine": false
-    },
-    "AssignmentStatement": {
-      "Wrap": "Do not wrap",
-      "AssignmentSignOnNextLine": false
-    },
-    "TernaryOperation": {
-      "Wrap": "Do not wrap",
-      "AlignWhenMultiline": false,
-      "QuestionMarkAndColonSignsOnNextLine": false
-    },
-    "Arrays": {
-      "Wrap": "Do not wrap",
-      "AlignWhenMultiline": false,
-      "NewLineAfterLeftBracket": false,
-      "PlaceRightBracketOnNewLine": false
-    },
-    "Objects": {
-      "Wrap": "Do not wrap",
-      "Align": "Do not align"
-    },
-    "VariableDeclarations": {
-      "Wrap": "Wrap if long",
-      "Align": "Do not align"
-    },
-    "ES6ImportExport": {
-      "Wrap": "Chop down if long",
-      "AlignFromClauses": false
-    }
-  },
-
-  "BlankLines": {
-    "KeepMaximumBlackLines": {
-      "InCode": 2
-    },
-    "MinimumBlackLines": {
-      "AfterImports": 2,
-      "AroundClass": 2,
-      "AroundField": 0,
-      "AroundMethod": 1,
-      "AroundFunction": 1
     }
   },
 

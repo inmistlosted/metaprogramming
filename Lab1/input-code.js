@@ -2,6 +2,18 @@
     The main Math class
     Contains all methods for performing basic math functions
 */
+
+this.fThree({strA: 'a',
+
+strB: 'b',
+
+strC: 'c',
+
+strD: 'd'
+
+}, 'strE');
+
+
 const c = 'bgf';
 const c = 'b';
 const c = '';
@@ -49,7 +61,7 @@ function () {
 }
 );
 
-import { Component } from 'react'
+import { Component } from 'react';
 
 export class Greeter {
     greetNTimes( to , { from , times } ) {
@@ -69,10 +81,9 @@ export class ReactGreeter extends Greeter {
     }
 }
 
-new ConsoleGreeter().greetNTimes('World' , { name : [ 'Webstorm' ] , times : 3 })
+new ConsoleGreeter().greetNTimes('World' , { name : [ 'Webstorm' ] , times : 3 });
 
-function*fibonacci( current = 1 , next = 1 ) {
-    yield current;
+function fibonacci( current = 1 , next = 1 ) {
     yield*fibonacci(next , current + next);
 }
 
@@ -118,29 +129,29 @@ function foo( x , y , z ) {
     }
 }
 
-class Foo {
-    field1 = 1;
+module.exports = {
+  host: '127.0.0.1',
+  sessionSecret: process.env.SESSION_SECRET,
 
-    field2 = 2;
+  github: {
+    clientID: process.env.GITHUB_ID,
+    clientSecret: process.env.GITHUB_SECRET
+  }
+};
 
+var myLink = {
+        img : "btn.gif" ,
+        text : "Button" ,
+        width : 128,
+    } ,
+    local = true ,
+    initial = -1;
+var cssClasses = [ "bold" ,
+    "red",
+];
+var selector = "id";
 
-    foo() {
-        console.log('foo')
-    }
+var color = "red" "rtd";
+var offset = 10;
 
-
-    static bar() {
-        function hello( n ) {
-            console.log('hello ' + n)
-        }
-
-        var x = 1;
-
-
-        while (x < 10) {
-            hello(x)
-        }
-    }
-}
-
-g
+varName = val;

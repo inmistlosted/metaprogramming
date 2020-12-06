@@ -2,6 +2,18 @@
     The main Math class
     Contains all methods for performing basic math functions
 */
+
+this.fThree({strA: 'a',
+
+strB: 'b',
+
+strC: 'c',
+
+strD: 'd'
+
+}, 'strE');
+
+
 const c = 'bgf';
 const c = 'b';
 const c = '';
@@ -116,6 +128,16 @@ function foo( x , y , z ) {
         }
     }
 }
+
+module.exports = {
+  host: '127.0.0.1',
+  sessionSecret: process.env.SESSION_SECRET,
+
+  github: {
+    clientID: process.env.GITHUB_ID,
+    clientSecret: process.env.GITHUB_SECRET
+  }
+};
 
 var myLink = {
         img : "btn.gif" ,

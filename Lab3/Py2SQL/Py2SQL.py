@@ -1,5 +1,6 @@
 import fdb
 import os
+from Py2SQL.entities.Object import Object
 
 
 class Py2SQL(object):
@@ -188,3 +189,139 @@ class Py2SQL(object):
             result.append(row_res)
 
         return result
+
+    def find_class(self, py_class):
+        sql_classes = """select trim("RDB$RELATION_NAME") from RDB$RELATIONS 
+                         where "RDB$RELATION_NAME" not like 'RDB$%' 
+                            and "RDB$RELATION_NAME" not like 'MON$%' 
+                            and "RDB$RELATION_NAME" not like 'SEC$%'"""
+
+        cursor1 = self.__connection.cursor()
+        cursor1.execute(sql_classes)
+        classes = [x[0] for x in cursor1.fetchall()]
+        cursor1.close()
+
+        class_attrs = self.getAttributes(py_class)
+        seeken_class = None
+        table_name = None
+        for clss in classes:
+            main_sql = f"""select trim(rrf."RDB$FIELD_NAME"), trim(rt."RDB$TYPE_NAME") 
+                                  from RDB$RELATION_FIELDS rrf 
+            	                    inner join RDB$FIELDS rf on rrf.RDB$FIELD_SOURCE = rf."RDB$FIELD_NAME" 
+            	                    inner join RDB$TYPES rt on rf."RDB$FIELD_TYPE" = rt.RDB$TYPE 
+                                  where rt."RDB$FIELD_NAME" = 'RDB$FIELD_TYPE' and rrf."RDB$RELATION_NAME" = '{clss}'"""
+
+            curr_cursor = self.__connection.cursor()
+            curr_cursor.execute(main_sql)
+            db_class_attrs = curr_cursor.fetchall()
+            curr_cursor.close()
+
+            right_attrs_count = 0
+            for attr in class_attrs:
+                for db_attr in db_class_attrs:
+                    if attr.lower() == db_attr[0].lower():
+                        right_attrs_count += 1
+
+            if right_attrs_count == len(db_class_attrs) and right_attrs_count == len(class_attrs):
+                seeken_class = db_class_attrs
+                table_name = clss
+
+        if seeken_class is None:
+            return []
+
+        sql_results_count = f"""select count(id)
+                                from {table_name}"""
+        cursor2 = self.__connection.cursor()
+        cursor2.execute(sql_results_count)
+        results_count = cursor2.fetchone()[0]
+        cursor2.close()
+
+        result = []
+        for i in range(0, results_count):
+            row_res = []
+            for field in seeken_class:
+                sql_res = f"""select {field[0]}
+                             from {table_name}"""
+                curr_cursor = self.__connection.cursor()
+                curr_cursor.execute(sql_res)
+                curr_res = curr_cursor.fetchall()[i][0]
+                curr_cursor.close()
+                row_res.append((*field, curr_res))
+            result.append(row_res)
+
+        return result
+
+    def find_classes_by(self, attributes):
+        sql_classes = """select trim("RDB$RELATION_NAME") from RDB$RELATIONS 
+                         where "RDB$RELATION_NAME" not like 'RDB$%' 
+                            and "RDB$RELATION_NAME" not like 'MON$%' 
+                            and "RDB$RELATION_NAME" not like 'SEC$%'"""
+
+        cursor1 = self.__connection.cursor()
+        cursor1.execute(sql_classes)
+        classes = [x[0] for x in cursor1.fetchall()]
+        cursor1.close()
+
+        seeken_classes = []
+        table_names = []
+        for clss in classes:
+            main_sql = f"""select trim(rrf."RDB$FIELD_NAME"), trim(rt."RDB$TYPE_NAME") 
+                                  from RDB$RELATION_FIELDS rrf 
+            	                    inner join RDB$FIELDS rf on rrf.RDB$FIELD_SOURCE = rf."RDB$FIELD_NAME" 
+            	                    inner join RDB$TYPES rt on rf."RDB$FIELD_TYPE" = rt.RDB$TYPE 
+                                  where rt."RDB$FIELD_NAME" = 'RDB$FIELD_TYPE' and rrf."RDB$RELATION_NAME" = '{clss}'"""
+
+            curr_cursor = self.__connection.cursor()
+            curr_cursor.execute(main_sql)
+            db_class_attrs = curr_cursor.fetchall()
+            curr_cursor.close()
+
+            right_attrs_count = 0
+            for attr in attributes:
+                for db_attr in db_class_attrs:
+                    if attr.lower() == db_attr[0].lower():
+                        right_attrs_count += 1
+
+            if right_attrs_count == len(attributes):
+                seeken_classes.append(db_class_attrs)
+                table_names.append(clss)
+
+        if len(seeken_classes) == 0:
+            return []
+
+        return seeken_classes
+
+    def create_object(self, table, id):
+        attributes = [x[1] for x in self.db_table_structure(table)]
+        attrs_sql = ""
+        i = 0
+        for attr in attributes:
+            koma = ", " if i > 0 else ""
+            attrs_sql += f"{koma}{attr}"
+            i += 1
+
+        sql = f"""select {attrs_sql}
+                  from (
+                        select row_number() over() as row_number, {attrs_sql}
+                        from {table})   
+                  where row_number = {id}"""
+
+        curr_cursor1 = self.__connection.cursor()
+        curr_cursor1.execute(sql)
+        entity = curr_cursor1.fetchone()
+        curr_cursor1.close()
+
+        obj = Object()
+        for j in range(0, len(attributes)):
+            setattr(obj, attributes[j].lower(), entity[j])
+
+        return obj
+
+    def create_objects(self, table, fid, lid):
+        objects = []
+
+        for id in range(fid, lid+1):
+            obj = self.create_object(table, id)
+            objects.append(obj)
+
+        return objects

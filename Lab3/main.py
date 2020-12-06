@@ -5,7 +5,7 @@ from entity.Dog2 import Dog2
 from Py2SQL.generators.FileGenerator import FileGenerator
 
 if __name__ == '__main__':
-    db = Database('localhost', 3050, 'path', 'SYSDBA', 'admin')
+    db = Database('localhost', 3050, 'D:/4kurs/1semestr/metaProgramming/Labs/Lab3/db/TEST.FDB', 'SYSDBA', 'admin')
     dbms = Py2SQL()
     dbms.db_connect(db)
     print(dbms.db_engine())
@@ -19,4 +19,11 @@ if __name__ == '__main__':
     attributes = [('age', 12), ('id', 1)]
     print(dbms.find_object('DOGS', dog))
     print(dbms.find_objects_by('DOGS', attributes))
-
+    
+    attrs = ['age']
+    print(dbms.find_class(Dog2))
+    print(dbms.find_classes_by(attrs))
+    df = dbms.create_object('DOGS', 2)
+    print(df.color)
+    objects = dbms.create_objects('DOGS', 1, 2)
+    print(objects[0].color)

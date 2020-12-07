@@ -15,13 +15,11 @@ if __name__ == '__main__':
     print(dbms.db_table_size('CATS'))
 
     dog = Dog(1, "Toto", 12, "black")
-    attributes = [('age', 12), ('id', 1)]
     print(dbms.find_object('DOGS', dog))
-    print(dbms.find_objects_by('DOGS', attributes))
+    print(dbms.find_objects_by('DOGS', age = 12, id = 1))
 
-    attrs = ['age']
     print(dbms.find_class(Dog2))
-    print(dbms.find_classes_by(attrs))
+    print(dbms.find_classes_by('age', 'id'))
     df = dbms.create_object('DOGS', 2)
     print(df.color)
     objects = dbms.create_objects('DOGS', 1, 2)

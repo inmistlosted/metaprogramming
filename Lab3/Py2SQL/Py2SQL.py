@@ -9,6 +9,20 @@ class Py2SQL(object):
     def __init__(self):
         self.__connection = None
         self.__db_info = None
+        self.__types_dict = {
+            "TEXT" : type('str'),
+            "SHORT" : type(1),
+            "LONG" : type(1),
+            "FLOAT" : type(1.1),
+            "DOUBLE" : type(1.1),
+            "VARYING" : type('str'),
+            "BLOB" : type(()),
+            "CSTRING" : type('str'),
+            "BLOB_ID" : type(1),
+            "INT64" : type(1),
+            "BOOLEAN" : type(True),
+            "DEFAULT" : type(None)
+        }
 
     def db_connect(self, db):
         self.__connection = fdb.connect(
@@ -74,7 +88,11 @@ class Py2SQL(object):
         columns = cursor.fetchall()
         cursor.close()
 
-        return columns
+        result = []
+        for column in columns:
+            result.append((column[0], column[1], self.covert_to_python_type(column[2])))
+
+        return result
 
     def db_table_size(self, table):
         sql = f"""select ((select count(*) from rdb$pages
@@ -125,28 +143,28 @@ class Py2SQL(object):
         result = []
         for attr in attributes:
             if attr[0].lower() in object_attributes:
-                result.append((*attr, object_attributes[attr[0].lower()]))
+                result.append((attr[0], self.covert_to_python_type(attr[1]), object_attributes[attr[0].lower()]))
 
         return result
 
-    def find_objects_by(self, table, attributes):
-        sql = f"""select * 
+    def find_objects_by(self, table, **attributes):
+        sql = f"""select *
                           from {table}
                           where """
         where = ""
 
         i = 0
-        for attr in attributes:
-            val = f"'{attr[1]}'" if type(attr[1]) == str else attr[1]
+        for key in attributes:
+            val = f"'{attributes[key]}'" if type(attributes[key]) == str else attributes[key]
             and_str = "and" if i > 0 else ""
-            where += f"{and_str} {attr[0]} = {val} "
+            where += f"{and_str} {key} = {val} "
             i += 1
 
         sql += where
-        main_sql = f"""select trim(rrf."RDB$FIELD_NAME"), trim(rt."RDB$TYPE_NAME") 
-                              from RDB$RELATION_FIELDS rrf 
-        	                    inner join RDB$FIELDS rf on rrf.RDB$FIELD_SOURCE = rf."RDB$FIELD_NAME" 
-        	                    inner join RDB$TYPES rt on rf."RDB$FIELD_TYPE" = rt.RDB$TYPE 
+        main_sql = f"""select trim(rrf."RDB$FIELD_NAME"), trim(rt."RDB$TYPE_NAME")
+                              from RDB$RELATION_FIELDS rrf
+        	                    inner join RDB$FIELDS rf on rrf.RDB$FIELD_SOURCE = rf."RDB$FIELD_NAME"
+        	                    inner join RDB$TYPES rt on rf."RDB$FIELD_TYPE" = rt.RDB$TYPE
                               where rt."RDB$FIELD_NAME" = 'RDB$FIELD_TYPE' and rrf."RDB$RELATION_NAME" = '{table}'
                                     and exists ({sql});"""
 
@@ -185,7 +203,7 @@ class Py2SQL(object):
                 curr_cursor.execute(sql_res)
                 curr_res = curr_cursor.fetchall()[i][0]
                 curr_cursor.close()
-                row_res.append((*field, curr_res))
+                row_res.append((field[0], self.covert_to_python_type(field[1]), curr_res))
             result.append(row_res)
 
         return result
@@ -246,12 +264,14 @@ class Py2SQL(object):
                 curr_cursor.execute(sql_res)
                 curr_res = curr_cursor.fetchall()[i][0]
                 curr_cursor.close()
-                row_res.append((*field, curr_res))
+                row_res.append((field[0], self.covert_to_python_type(field[1]), curr_res))
             result.append(row_res)
 
         return result
 
-    def find_classes_by(self, attributes):
+    def find_classes_by(self, *attributes):
+        attributes = [x for x in attributes]
+
         sql_classes = """select trim("RDB$RELATION_NAME") from RDB$RELATIONS 
                          where "RDB$RELATION_NAME" not like 'RDB$%' 
                             and "RDB$RELATION_NAME" not like 'MON$%' 
@@ -283,7 +303,11 @@ class Py2SQL(object):
                         right_attrs_count += 1
 
             if right_attrs_count == len(attributes):
-                seeken_classes.append(db_class_attrs)
+                res = []
+                for db_attr in db_class_attrs:
+                    res.append((db_attr[0], self.covert_to_python_type(db_attr[1])))
+
+                seeken_classes.append(res)
                 table_names.append(clss)
 
         if len(seeken_classes) == 0:
@@ -292,6 +316,23 @@ class Py2SQL(object):
         return seeken_classes
 
     def create_object(self, table, id):
+        unique_key_sql = f"""select trim("RDB$FIELD_NAME") 
+                             from RDB$INDEX_SEGMENTS ris 
+                             where "RDB$INDEX_NAME" =
+                                (select "RDB$INDEX_NAME" 
+                                 from RDB$INDICES ri 
+                                 where "RDB$RELATION_NAME" = '{table}' and RDB$UNIQUE_FLAG = 1)"""
+
+        curr_cursor = self.__connection.cursor()
+        curr_cursor.execute(unique_key_sql)
+        unique_key_result = curr_cursor.fetchone()
+        curr_cursor.close()
+
+        if unique_key_result is None:
+            raise Exception(f"Table {table} has no unique key to find object by id")
+
+        unique_key = unique_key_result[0]
+
         attributes = [x[1] for x in self.db_table_structure(table)]
         attrs_sql = ""
         i = 0
@@ -301,15 +342,16 @@ class Py2SQL(object):
             i += 1
 
         sql = f"""select {attrs_sql}
-                  from (
-                        select row_number() over() as row_number, {attrs_sql}
-                        from {table})   
-                  where row_number = {id}"""
+                  from {table} 
+                  where {unique_key} = {id}"""
 
         curr_cursor1 = self.__connection.cursor()
         curr_cursor1.execute(sql)
         entity = curr_cursor1.fetchone()
         curr_cursor1.close()
+
+        if entity is None:
+            raise Exception(f"There is no object in table {table} with id = {id}")
 
         obj = Object()
         for j in range(0, len(attributes)):
@@ -418,6 +460,11 @@ class Py2SQL(object):
         unique_list = list(unique_set)
 
         return unique_list
+
+    def covert_to_python_type(self, attr):
+        if attr in self.__types_dict:
+            return self.__types_dict[attr]
+        return self.__types_dict["DEFAULT"]
 
 class Database(object):
     def __init__(self, host, port, name, username, password):

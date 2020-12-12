@@ -25,6 +25,12 @@ class Py2SQL(object):
         }
 
     def db_connect(self, db):
+        """Connects to firebird database
+
+        :parameter:db (Database): object with database settings
+
+        """
+
         self.__connection = fdb.connect(
             host=db.host,
             port=db.port,
@@ -36,9 +42,16 @@ class Py2SQL(object):
         self.__db_info = db
 
     def db_disconnect(self):
+        """Disconnects from firebird database"""
+
         self.__connection.close()
 
     def db_engine(self):
+        """Version of DBMS Firebird
+
+        :returns version of DBMS Firebird
+        """
+
         sql = """select rdb$get_context('SYSTEM', 'ENGINE_VERSION')
                  from rdb$database"""
 
@@ -50,9 +63,19 @@ class Py2SQL(object):
         return f"{self.__DBMS_name} version {version}"
 
     def db_name(self):
+        """Name of database
+
+        :returns name of database
+        """
+
         return os.path.split(self.__db_info.name)[1].split('.')[0]
 
     def db_size(self):
+        """Size of database
+
+        :returns size of database in MB
+        """
+
         sql = """select ((select count(*) from rdb$pages)) * 
                  (select mon$page_size from mon$database) / 1
                   from rdb$database;"""
@@ -65,6 +88,11 @@ class Py2SQL(object):
         return f"{size} MB"
 
     def db_tables(self):
+        """Tables in database
+
+        :returns list of tables in database
+        """
+
         sql = """select a.RDB$RELATION_NAME
                  from RDB$RELATIONS a
                  where coalesce(RDB$SYSTEM_FLAG, 0) = 0 and RDB$RELATION_TYPE = 0"""
@@ -77,6 +105,13 @@ class Py2SQL(object):
         return tables
 
     def db_table_structure(self, table):
+        """Table structure
+
+        :parameter table (str): table name
+
+        :returns list of fields of table
+        """
+
         sql = f"""select row_number() over(), trim(rrf."RDB$FIELD_NAME"), trim(rt."RDB$TYPE_NAME") 
                   from RDB$RELATION_FIELDS rrf 
 	                inner join RDB$FIELDS rf on rrf.RDB$FIELD_SOURCE = rf."RDB$FIELD_NAME" 
@@ -95,6 +130,13 @@ class Py2SQL(object):
         return result
 
     def db_table_size(self, table):
+        """Table size
+
+        :parameter table (str): table name
+
+        :returns size of table in MB
+        """
+
         sql = f"""select ((select count(*) from rdb$pages
                            where rdb$relation_id = (select rdb$relation_id
                                                     from rdb$relations
@@ -110,6 +152,14 @@ class Py2SQL(object):
         return f"{size} MB"
 
     def find_object(self, table, py_object):
+        """Find object
+
+        :parameter table (str): table name
+        :parameter py_object (object): object to be found in table
+
+        :returns list of tuples of fields of found object in table
+        """
+
         object_attributes = py_object.__dict__
         sql = f"""select * 
                   from {table}
@@ -148,6 +198,14 @@ class Py2SQL(object):
         return result
 
     def find_objects_by(self, table, **attributes):
+        """Find objects by attributes
+
+        :parameter table (str): table name
+        :parameter attributes (dict): attributes, that found objects should contain
+
+        :returns list of list of tuples of fields of found objects in table
+        """
+
         sql = f"""select *
                           from {table}
                           where """
@@ -209,6 +267,13 @@ class Py2SQL(object):
         return result
 
     def find_class(self, py_class):
+        """Find class
+
+        :parameter py_class (object): python class
+
+        :returns list of tuples of fields of found table in database
+        """
+
         sql_classes = """select trim("RDB$RELATION_NAME") from RDB$RELATIONS 
                          where "RDB$RELATION_NAME" not like 'RDB$%' 
                             and "RDB$RELATION_NAME" not like 'MON$%' 
@@ -270,6 +335,13 @@ class Py2SQL(object):
         return result
 
     def find_classes_by(self, *attributes):
+        """Find classes by attributes
+
+        :parameter attributes (tuple): attributes, that found tables should contain
+
+        :returns list of list of tuples of fields of found tables in database
+        """
+
         attributes = [x for x in attributes]
 
         sql_classes = """select trim("RDB$RELATION_NAME") from RDB$RELATIONS 
@@ -316,6 +388,14 @@ class Py2SQL(object):
         return seeken_classes
 
     def create_object(self, table, id):
+        """Creates python object from table with id
+
+        :parameter table (str): table name
+        :parameter id (int): identifier of found object
+
+        :returns created object from table with id
+        """
+
         unique_key_sql = f"""select trim("RDB$FIELD_NAME") 
                              from RDB$INDEX_SEGMENTS ris 
                              where "RDB$INDEX_NAME" =
@@ -360,6 +440,15 @@ class Py2SQL(object):
         return obj
 
     def create_objects(self, table, fid, lid):
+        """Creates python objects from table with ids between fid and lid
+
+        :parameter table (str): table name
+        :parameter fid (int): smallest identifier of objects to be found
+        :parameter lid (int): biggest identifier of objects to be found
+
+        :returns list of created objects from table with ids
+        """
+
         objects = []
 
         for id in range(fid, lid+1):
@@ -369,6 +458,13 @@ class Py2SQL(object):
         return objects
 
     def getAttributes(self, clss):
+        """Get attributes of class
+
+        :parameter clss (object): python class
+
+        :returns dictionary of attributes of class
+        """
+
         attrs = {}
         for name in vars(clss):
             if name.startswith("__") or name.endswith("__"):
@@ -380,6 +476,13 @@ class Py2SQL(object):
         return attrs
 
     def create_class(self, table, module):
+        """Creates python module from table
+
+        :parameter table (str): table name
+        :parameter module (str): module name
+
+        """
+
         attributes = [x[1] for x in self.db_table_structure(table)]
         class_name = table[:len(table)-1] if table.lower().endswith('s') else table
         class_name = class_name.lower().capitalize()
@@ -393,6 +496,13 @@ class Py2SQL(object):
         FileGenerator.import_module(filename, module, class_name, created)
 
     def create_hierarchy(self, table, package):
+        """Creates python package from table that consists of modules that are created from tables connected with table
+
+        :parameter table (str): table name
+        :parameter module (str): package name
+
+        """
+
         package_created = FileGenerator.create_package(package)
 
         if package_created:
@@ -413,6 +523,14 @@ class Py2SQL(object):
                 FileGenerator.import_package_module(filename, package, class_name, created)
 
     def with_linked_tables(self, table, already_found = None):
+        """Get all linked tables to table
+
+        :parameter table (str): table name
+        :parameter already_found (list): list of already found table names
+
+        :returns list of connected tables
+        """
+
         sql_linked = f"""select trim("RDB$RELATION_NAME") 
                          from RDB$INDICES ri 
                          where "RDB$INDEX_NAME" in (
@@ -462,6 +580,13 @@ class Py2SQL(object):
         return unique_list
 
     def covert_to_python_type(self, attr):
+        """Converts database type to python type
+
+        :parameter attr (str): name of attribute
+
+        :returns converted python type
+        """
+
         if attr in self.__types_dict:
             return self.__types_dict[attr]
         return self.__types_dict["DEFAULT"]
@@ -501,7 +626,15 @@ class Object(object):
 
 class FileGenerator(object):
     @staticmethod
-    def get_python_class(className, attrs):
+    def get_python_class(class_name, attrs):
+        """Generates python class code
+
+        :parameter class_name (str): class name
+        :parameter attrs (list): list of attributes
+
+        :returns generated python class code
+        """
+
         attrs_args = ""
         attrs_inits = ""
         attrs_getsets = ""
@@ -518,25 +651,47 @@ class FileGenerator(object):
             i += 1
 
         koma = ", " if len(attrs) > 0 else ""
-        return f"""class {className}(object):
+        return f"""class {class_name}(object):
     def __init__(self{koma}{attrs_args}):
 {attrs_inits}    
 {attrs_getsets}"""
 
     @staticmethod
     def create_getter(attr):
+        """Generates getter for attribute
+
+        :parameter attr (str): attribute name
+
+        :returns generated getter for attribute
+        """
+
         return f"""    @property
     def {attr}(self):
         return self.__{attr}\n\n"""
 
     @staticmethod
     def create_setter(attr):
+        """Generates setter for attribute
+
+        :parameter attr (str): attribute name
+
+        :returns generated setter for attribute
+        """
+
         return f"""    @{attr}.setter
     def {attr}(self, {attr}):
         self.__{attr} = {attr}\n\n"""
 
     @staticmethod
     def create_class(class_name, content):
+        """Creates module
+
+        :parameter class_name (str): module name
+        :parameter content (str): generated class
+
+        :returns status if module was created
+        """
+
         if not os.path.exists(class_name):
             file_name = f"{class_name}.py"
             f = open(file_name, 'w')
@@ -547,6 +702,15 @@ class FileGenerator(object):
 
     @staticmethod
     def import_module(file, module, class_name, created):
+        """Imports to global scope newly created module
+
+        :parameter file (str): file name
+        :parameter module (str): module name
+        :parameter class_name (str): class name
+        :parameter created (boolean): status if module was created
+
+        """
+
         if created:
             import_str = f"from {module} import {class_name}\n"
 
@@ -557,6 +721,15 @@ class FileGenerator(object):
 
     @staticmethod
     def import_package_module(file, package, class_name, created):
+        """Imports to global scope newly created module in package
+
+        :parameter file (str): file name
+        :parameter package (str): package name
+        :parameter class_name (str): class name
+        :parameter created (boolean): status if module was created
+
+        """
+
         if created:
             import_str = f"from {package}.{class_name.lower()} import {class_name}\n"
 
@@ -567,6 +740,13 @@ class FileGenerator(object):
 
     @staticmethod
     def create_package(package):
+        """Creates package
+
+        :parameter package (str): package name
+
+        :returns status if package was created
+        """
+
         if not os.path.exists(package):
             os.makedirs(package)
             init_path = os.path.join(package, '__init__.py')
@@ -577,6 +757,15 @@ class FileGenerator(object):
 
     @staticmethod
     def create_package_module(package, module, content):
+        """Creates module in package
+
+        :parameter package (str): package name
+        :parameter module (str): module name
+        :parameter content (str): generated class
+
+        :returns status if package module was created
+        """
+
         if os.path.exists(package):
             file_name = os.path.join(package, f"{module}.py")
 
